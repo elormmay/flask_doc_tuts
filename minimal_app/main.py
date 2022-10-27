@@ -4,9 +4,13 @@ from markupsafe import escape
 app = Flask(__name__)
 
 
+from flask import abort, redirect, url_for
+
+
 @app.route("/")
-def hello_world():
-    return "<p>Hello World</p>"
+def index():
+    # return "<p>Hello World</p>"
+    return redirect(url_for("sign_in"))
 
 
 @app.route("/sign_in")
@@ -48,7 +52,7 @@ def about():
 from flask import url_for
 
 with app.test_request_context():
-    print(url_for("hello_world"))
+    print(url_for("index"))
     print(url_for("about"))
     print(url_for("sign_in", next="/"))
     print(url_for("projects"))
@@ -126,3 +130,15 @@ def upload_file():
         print("Uploaded file!")
 
     return render_template("upload.html")
+
+
+# Redirect and errors
+@app.route("/no_page_found")
+def no_page_found():
+    return page_not_found()
+
+
+@app.errorhandler(404)
+def page_not_found():
+    # abort(404) #or
+    return render_template("page_not_found.html"), 404
