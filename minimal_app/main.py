@@ -1,4 +1,3 @@
-from fileinput import filename
 from flask import Flask
 from markupsafe import escape
 
@@ -60,12 +59,12 @@ with app.test_request_context():
 from flask import request
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        return "do_the_login()"
-    else:
-        return "show_the_login_form()"
+# @app.route("/login", methods=["GET", "POST"])
+# def login():
+#     if request.method == "POST":
+#         return "do_the_login()"
+#     else:
+#         return "show_the_login_form()"
 
 
 # or
@@ -92,4 +91,38 @@ from flask import render_template
 @app.route("/hello")
 @app.route("/hello/<name>")
 def hello(name=None):
+    # http://127.0.0.1:5000/hello?key=123&name=xxx
+    searchword = request.args.get("name", "")
+    print(f"url data---: {searchword}")
     return render_template("hello.html", name=name)
+
+
+# Request object
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        if valid_login(request.form["username"], request.form["password"]):
+            return log_the_user_in(request.form["username"])
+        else:
+            error = "Invalid username or password"
+    return render_template("login.html", error=error)
+
+
+# file upload
+from werkzeug.utils import secure_filename
+
+
+@app.route("/upload", methods=["GET", "POST"])
+def upload_file():
+    if request.method == "POST":
+        print("Uploading file...")
+        file = request.files["photo"]
+        # file.save("/var/www/uploads/uploaded_file.jpg")  # change file name
+        file.save(
+            f"/var/www/uploads/{secure_filename(file.filename)}"
+        )  # use user file name
+
+        print("Uploaded file!")
+
+    return render_template("upload.html")
