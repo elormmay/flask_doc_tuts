@@ -7,7 +7,7 @@ app = Flask(__name__)
 from flask import abort, redirect, url_for
 
 
-@app.route("/")
+@app.route("/index")
 def index():
     # return "<p>Hello World</p>"
     return redirect(url_for("sign_in"))
@@ -142,3 +142,32 @@ def no_page_found():
 def page_not_found():
     # abort(404) #or
     return render_template("page_not_found.html"), 404
+
+
+# session
+from flask import session
+
+import secrets
+
+print("=========== ", secrets.token_hex())
+
+
+@app.route("/")
+def sessions():
+    print(session)
+    app.logger.error("An error occurred")
+    if "username" in session:
+        return f'Logged in as {session["username"]}'
+    return "You are not logged in"
+
+
+@app.route("/profile", methods=["GET"])
+def user_profile():
+    result = {
+        "name": "Mawulorm",
+        "age": 82,
+        "gender": "Male",
+        "hobby": ["Coding, Teaching, Footballing"],
+    }
+
+    return result["name"]
